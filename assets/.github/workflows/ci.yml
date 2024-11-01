@@ -1,0 +1,46 @@
+name: CD-SERVER
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+-build'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+
+    strategy:
+      matrix:
+        node-version: [ 20.x ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run Linter
+        run: yarn lint
+
+      - name: Build project
+        run: yarn build
+
+      - name: Build Docker image And Publish
+        run: |
+          GITHUB_REF_NAME = ${{ github.ref_name }}
+          TAG_VERSION=$(echo ${ GITHUB_REF_NAME//-server/ })
+          docker build -t ghcr.io/${{ github.repository_owner }}/web:${TAG_VERSION} -f Dockerfile .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push ghcr.io/${{ github.repository_owner }}/web:${TAG_VERSION}

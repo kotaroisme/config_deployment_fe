@@ -1,0 +1,30 @@
+services:
+  web:
+    image: "ghcr.io/${OWNER}/megumi:${TAG}"
+    ports:
+      - "3000:3000"
+    restart: always
+    networks:
+      - internal_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  nginx:
+    image: nginx
+    depends_on:
+      - web
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./volumes/nginx/conf/:/etc/nginx/conf.d:ro
+      - ./volumes/nginx/ssl/:/etc/nginx/ssl:ro
+    networks:
+      - internal_network
+    restart: always
+networks:
+  internal_network:
+
+

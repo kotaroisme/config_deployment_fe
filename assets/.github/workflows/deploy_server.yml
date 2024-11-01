@@ -1,0 +1,50 @@
+name: CD-PRODUCTION
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+-server'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+
+    strategy:
+      matrix:
+        node-version: [ 20.x ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build project
+        run: yarn build
+
+      - name: Build Docker image And Publish
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/web:${{github.ref_name}} -f Dockerfile .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push ghcr.io/${{ github.repository_owner }}/web:${{github.ref_name}}
+
+      - name: Deploy
+        run: |
+          mkdir -p ~/.ssh
+          echo -e "${{ secrets.SSH_PRIVATE_KEY_SERVER }}" >> ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+          eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519
+          ssh -tt ${{ secrets.SSH }} -i ~/.ssh/id_ed25519 "/home/deployer/web/deploy.sh ${{github.ref_name}} ${{ github.repository_owner }} ${{ secrets.GITHUB_TOKEN }} ${{ github.actor }}"
