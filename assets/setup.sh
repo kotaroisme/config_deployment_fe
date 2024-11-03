@@ -12,8 +12,8 @@ scp .env deployer@123.123.123.12:/home/deployer/web
 
 scp docker-compose.yml deployer@123.123.123.12:/home/deployer/web
 
-scp config/ssl/fullchain.pem deployer@123.123.123.12:/home/deployer/web/volumes/nginx/ssl/fullchain.pem
-scp config/ssl/privkey.pem deployer@123.123.123.12:/home/deployer/web/volumes/nginx/ssl/privkey.pem
+scp config/cert_ssl/fullchain.pem deployer@123.123.123.12:/home/deployer/web/volumes/nginx/ssl/fullchain.pem
+scp config/cert_ssl/privkey.pem deployer@123.123.123.12:/home/deployer/web/volumes/nginx/ssl/privkey.pem
 
 scp config/nginx.conf deployer@123.123.123.12:/home/deployer/web/volumes/nginx/conf/default.conf
 

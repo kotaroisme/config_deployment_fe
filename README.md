@@ -27,9 +27,9 @@ change code in +page.svelte
 
 ```html
 <container class="flex h-screen items-center justify-center bg-orange-500">
-	<div class="font-bold text-white">
-		Welcome to event<span class=" text-[2rem]">"Deployment [FE]"</span><br />
-	</div>
+    <div class="font-bold text-white">
+        Welcome to event<span class=" text-[2rem]">"Deployment [FE]"</span><br />
+    </div>
 </container>
 ```
 ![img_1.png](img_1.png)
@@ -56,16 +56,16 @@ add to package.json
 
 ```json
 {
-    ...,
-    "license": "MIT",
-    "private": true,
-    ...,
-    
-    "lint-staged": {
-        "**/*.{js,ts,svelte}": [
-        "yarn run lint"
-        ]
-    }
+  ...,
+  "license": "MIT",
+  "private": true,
+  ...,
+
+  "lint-staged": {
+    "**/*.{js,ts,svelte}": [
+      "yarn run lint"
+    ]
+  }
 }
 ```
 
@@ -134,13 +134,36 @@ Secret: ****
 
 Name: SSH_PRIVATE_KEY_SERVER
 Secret: ****
+
+# -------------
+
+Name: SSH
+Secret: deployer@123.123.123.12
 ```
 
 How to get SSH_PRIVATE_KEY_SERVER ?
 ```bash
 ssh deployer@123.123.123.12
-cat .ssh/id_ed25519.pub # -> copy and paste to SSH_PRIVATE_KEY_SERVER
+cat .ssh/id_ed25519 # -> copy and paste to SSH_PRIVATE_KEY_SERVER
 ```
 
 ## Github workflow
-Check in assets/.github/workflows
+Open assets/.github/workflows
+Choose one, ex: [deploy_server.yml](assets/.github/workflows/deploy_server.yml)
+```html
+.github
+|-- workflow
+|---- [deploy_server.yml](assets/.github/workflows/deploy_server.yml)
+
+```
+
+## Setup Code
+run line by line in:
+[setup.sh](assets/setup.txt)
+
+## Setup SSL
+![img_3.png](img_3.png)
+
+add to assets > config > ssl
+
+# DONE!
